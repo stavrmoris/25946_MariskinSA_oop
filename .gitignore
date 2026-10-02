@@ -1,4 +1,4 @@
-# Keep only C++ sources and optional build instructions.
+# Сохраняем исходники C++ и необходимые инструкции по сборке.
 *
 !*/
 !*.cpp
@@ -7,5 +7,5 @@
 !/.gitignore
 !README.md
 !BUILD.md
-# Required Markdown output for homework 3.IV.
+# Обязательный результат домашнего задания 3.IV в формате Markdown.
 !/S_03/Task_04/results.md

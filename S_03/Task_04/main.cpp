@@ -17,6 +17,7 @@ std::string format_value(const Value& value)
 {
     std::ostringstream output;
     if constexpr (std::is_floating_point_v<Value>) {
+        // сохраняем достаточно цифр для точного представления исходного числа
         output << std::setprecision(std::numeric_limits<Value>::max_digits10);
     }
     output << value;
@@ -27,6 +28,7 @@ template <typename Container>
 std::string value_at(const Container& values, std::size_t index)
 {
     auto it = values.begin();
+    // доходим до элемента по позиции через итератор, чтобы поддержать и list
     std::advance(it, static_cast<typename std::iterator_traits<decltype(it)>::difference_type>(index));
     return format_value(*it);
 }
@@ -48,11 +50,11 @@ std::vector<std::string> make_table_lines(
     const task_04::ArrayResults& deque_result)
 {
     std::vector<std::string> rows{
-        "| array input | vector result | vector input | list result | list input | deque result | deque input | array result |",
+        "| Исходные значения array | Результаты в vector | Исходные значения vector | Результаты в list | Исходные значения list | Результаты в deque | Исходные значения deque | Результаты в array |",
         "| ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |"
     };
 
-    // The one for loop below generates every data row in the Markdown table.
+    // по условию все строки данных таблицы создаются одним циклом for
     for (std::size_t i = 0; i < task_04::M; ++i) {
         std::ostringstream row;
         row << "| " << value_at(array_values, i)
@@ -67,11 +69,12 @@ std::vector<std::string> make_table_lines(
     }
     return rows;
 }
-} // namespace
+}
 
 int main()
 {
     std::mt19937 engine(std::random_device{}());
+    // один случайный второй аргумент используется во всех вызовах функции
     const task_04::T1 shared_argument = task_04::random_value<task_04::T1>(engine);
 
     const auto array_values = task_04::make_array(engine);
@@ -79,6 +82,7 @@ int main()
     const auto list_values = task_04::make_list(engine);
     const auto deque_values = task_04::make_deque(engine);
 
+    // каждый исходный контейнер обрабатывается отдельно с сохранением порядка элементов
     const auto array_result = task_04::array_to_vector(array_values, shared_argument);
     const auto vector_result = task_04::vector_to_list(vector_values, shared_argument);
     const auto list_result = task_04::list_to_deque(list_values, shared_argument);
@@ -90,19 +94,19 @@ int main()
 
     std::ofstream file("results.md");
     if (!file) {
-        std::cerr << "Cannot open results.md for writing. Run the program from its task directory.\n";
+        std::cerr << "Не удалось открыть results.md для записи. Запустите программу из папки задания.\n";
         return 1;
     }
 
-    file << "# Container transformation results\n\n"
-         << "Shared second argument for every container: `"
+    file << "# Результаты обработки контейнеров\n\n"
+         << "Общий второй аргумент для всех контейнеров: `"
          << std::setprecision(std::numeric_limits<task_04::T1>::max_digits10)
          << shared_argument << "`.\n\n";
     for (const auto& row : rows) {
         file << row << '\n';
     }
 
-    std::cout << "Generated results.md with " << task_04::M
-              << " data rows; shared second argument = " << shared_argument << ".\n";
+    std::cout << "Создан файл results.md; строк данных: " << task_04::M
+              << "; общий второй аргумент = " << shared_argument << ".\n";
     return file ? 0 : 1;
 }

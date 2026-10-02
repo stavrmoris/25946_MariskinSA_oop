@@ -3,8 +3,8 @@
 #include <cstddef>
 
 namespace task_04_config {
-using T1 = double;
-using T2 = int;
-inline constexpr std::size_t M = 14;
-inline constexpr int N = 2;
-} // namespace task_04_config
+    using T1 = double; // входной тип
+    using T2 = int; // выходной тип
+    inline constexpr std::size_t M = 14; // количество элементов в каждом контейнере
+    inline constexpr int N = 2; // от -N до N
+}

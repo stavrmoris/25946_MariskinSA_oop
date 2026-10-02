@@ -17,12 +17,13 @@ using task_04_config::N;
 using task_04_config::T1;
 using task_04_config::T2;
 
-static_assert(M > 0, "M must be greater than zero");
-static_assert(N >= 0, "N must not be negative");
-static_assert(std::is_arithmetic_v<T1>, "T1 must be a numeric type");
-static_assert(std::is_arithmetic_v<T2>, "T2 must be a numeric type");
-static_assert(std::is_signed_v<T1>, "T1 must represent values below zero");
-static_assert(!std::is_same_v<T1, T2>, "T1 and T2 must be different types");
+// ограничения
+static_assert(M > 0, "M должно быть больше нуля");
+static_assert(N >= 0, "N не должно быть отрицательным");
+static_assert(std::is_arithmetic_v<T1>, "T1 должен быть числовым типом");
+static_assert(std::is_arithmetic_v<T2>, "T2 должен быть числовым типом");
+static_assert(std::is_signed_v<T1>, "T1 должен поддерживать отрицательные значения");
+static_assert(!std::is_same_v<T1, T2>, "Типы T1 и T2 должны различаться");
 
 using Inputs = std::array<T1, M>;
 using ArrayResults = std::array<T2, M>;
@@ -33,8 +34,9 @@ using DequeResults = std::deque<T2>;
 template <typename Value>
 Value random_value(std::mt19937& engine)
 {
+    // при компиляции выбирается распределение для нужного типа чисел
     if constexpr (std::is_integral_v<Value>) {
-        static_assert(N <= std::numeric_limits<Value>::max(), "N exceeds the range of T1");
+        static_assert(N <= std::numeric_limits<Value>::max(), "N превышает диапазон значений типа T1");
         std::uniform_int_distribution<long long> distribution(-N, N);
         return static_cast<Value>(distribution(engine));
     } else {
@@ -47,7 +49,7 @@ Value random_value(std::mt19937& engine)
 inline Inputs make_array(std::mt19937& engine)
 {
     Inputs values{};
-    // Classical for with an index.
+    // обычный цикл for с индексом
     for (std::size_t i = 0; i < M; ++i) {
         values[i] = random_value<T1>(engine);
     }
@@ -57,7 +59,7 @@ inline Inputs make_array(std::mt19937& engine)
 inline std::vector<T1> make_vector(std::mt19937& engine)
 {
     std::vector<T1> values(M);
-    // Iterator-based for.
+    // цикл for с итератором
     for (auto it = values.begin(); it != values.end(); ++it) {
         *it = random_value<T1>(engine);
     }
@@ -67,7 +69,7 @@ inline std::vector<T1> make_vector(std::mt19937& engine)
 inline std::list<T1> make_list(std::mt19937& engine)
 {
     std::list<T1> values(M);
-    // Range-based for.
+    // цикл for по элементам контейнера
     for (auto& value : values) {
         value = random_value<T1>(engine);
     }
@@ -85,12 +87,14 @@ inline std::deque<T1> make_deque(std::mt19937& engine)
 
 T2 apply_average(const T1& value, const T1& shared_argument)
 {
+    // тип аргументов выводится из значений, тип результата задаём явно
     return modified::average<T2>(value, shared_argument);
 }
 
 inline VectorResults array_to_vector(const Inputs& source, const T1& shared_argument)
 {
     VectorResults result;
+    // выделяем память под m элементов, сам вектор пока пустой
     result.reserve(M);
     for (std::size_t i = 0; i < M; ++i) {
         result.push_back(apply_average(source[i], shared_argument));
@@ -125,4 +129,4 @@ inline ArrayResults deque_to_array(const std::deque<T1>& source, const T1& share
     }
     return result;
 }
-} // namespace task_04
+}
