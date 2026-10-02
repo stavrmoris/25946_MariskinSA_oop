@@ -27,9 +27,9 @@ std::string format_value(const Value& value)
 template <typename Container>
 std::string value_at(const Container& values, std::size_t index)
 {
-    auto it = values.begin();
+    typename Container::const_iterator it = values.begin();
     // доходим до элемента по позиции через итератор, чтобы поддержать и list
-    std::advance(it, static_cast<typename std::iterator_traits<decltype(it)>::difference_type>(index));
+    std::advance(it, static_cast<typename Container::difference_type>(index));
     return format_value(*it);
 }
 
@@ -77,18 +77,18 @@ int main()
     // один случайный второй аргумент используется во всех вызовах функции
     const task_04::T1 shared_argument = task_04::random_value<task_04::T1>(engine);
 
-    const auto array_values = task_04::make_array(engine);
-    const auto vector_values = task_04::make_vector(engine);
-    const auto list_values = task_04::make_list(engine);
-    const auto deque_values = task_04::make_deque(engine);
+    const task_04::Inputs array_values = task_04::make_array(engine);
+    const std::vector<task_04::T1> vector_values = task_04::make_vector(engine);
+    const std::list<task_04::T1> list_values = task_04::make_list(engine);
+    const std::deque<task_04::T1> deque_values = task_04::make_deque(engine);
 
     // каждый исходный контейнер обрабатывается отдельно с сохранением порядка элементов
-    const auto array_result = task_04::array_to_vector(array_values, shared_argument);
-    const auto vector_result = task_04::vector_to_list(vector_values, shared_argument);
-    const auto list_result = task_04::list_to_deque(list_values, shared_argument);
-    const auto deque_result = task_04::deque_to_array(deque_values, shared_argument);
+    const task_04::VectorResults array_result = task_04::array_to_vector(array_values, shared_argument);
+    const task_04::ListResults vector_result = task_04::vector_to_list(vector_values, shared_argument);
+    const task_04::DequeResults list_result = task_04::list_to_deque(list_values, shared_argument);
+    const task_04::ArrayResults deque_result = task_04::deque_to_array(deque_values, shared_argument);
 
-    const auto rows = make_table_lines(
+    const std::vector<std::string> rows = make_table_lines(
         array_values, vector_values, list_values, deque_values,
         array_result, vector_result, list_result, deque_result);
 
@@ -102,7 +102,7 @@ int main()
          << "Общий второй аргумент для всех контейнеров: `"
          << std::setprecision(std::numeric_limits<task_04::T1>::max_digits10)
          << shared_argument << "`.\n\n";
-    for (const auto& row : rows) {
+    for (const std::string& row : rows) {
         file << row << '\n';
     }
 

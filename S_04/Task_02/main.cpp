@@ -11,7 +11,7 @@ void print_frequencies(const task_02::Frequencies& counts)
         std::cout << "подходящих чисел нет\n";
         return;
     }
-    for (const auto& entry : counts) {
+    for (const task_02::Frequencies::value_type& entry : counts) {
         std::cout << entry.first << ": " << entry.second << '\n';
     }
 }
@@ -46,7 +46,7 @@ void print_common_duplicates(const task_02::Frequencies& common,
         return;
     }
     std::cout << "число | количество в первом | количество во втором\n";
-    for (const auto& entry : common) {
+    for (const task_02::Frequencies::value_type& entry : common) {
         std::cout << entry.first << " | " << entry.second
                   << " | " << second.at(entry.first) << '\n';
     }
@@ -63,8 +63,8 @@ int main(int argc, char* argv[])
     try {
         std::string first_path = argc == 3 ? argv[1] : "s04_v1_46_1.txt";
         std::string second_path = argc == 3 ? argv[2] : "s04_v1_46_2.txt";
-        auto first = task_02::read_numbers(first_path);
-        auto second = task_02::read_numbers(second_path);
+        task_02::Numbers first = task_02::read_numbers(first_path);
+        task_02::Numbers second = task_02::read_numbers(second_path);
         // первым считается больший по количеству элементов вектор
         if (first.size() < second.size()) {
             std::swap(first, second);
@@ -76,8 +76,8 @@ int main(int argc, char* argv[])
         print_vector_info(first, "первый вектор");
         print_vector_info(second, "второй вектор");
 
-        const auto first_counts = task_02::frequencies_for(first);
-        const auto second_counts = task_02::frequencies_for(second);
+        const task_02::Frequencies first_counts = task_02::frequencies_for(first);
+        const task_02::Frequencies second_counts = task_02::frequencies_for(second);
         std::cout << "\nчисла второго вектора с частотой 2 и более:\n";
         print_frequencies(task_02::repeated_values(second_counts, 2));
         std::cout << "числа первого вектора с частотой больше 3:\n";

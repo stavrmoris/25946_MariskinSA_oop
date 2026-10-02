@@ -60,7 +60,7 @@ inline std::vector<T1> make_vector(std::mt19937& engine)
 {
     std::vector<T1> values(M);
     // цикл for с итератором
-    for (auto it = values.begin(); it != values.end(); ++it) {
+    for (std::vector<T1>::iterator it = values.begin(); it != values.end(); ++it) {
         *it = random_value<T1>(engine);
     }
     return values;
@@ -70,7 +70,7 @@ inline std::list<T1> make_list(std::mt19937& engine)
 {
     std::list<T1> values(M);
     // цикл for по элементам контейнера
-    for (auto& value : values) {
+    for (T1& value : values) {
         value = random_value<T1>(engine);
     }
     return values;
@@ -79,7 +79,7 @@ inline std::list<T1> make_list(std::mt19937& engine)
 inline std::deque<T1> make_deque(std::mt19937& engine)
 {
     std::deque<T1> values(M);
-    for (auto& value : values) {
+    for (T1& value : values) {
         value = random_value<T1>(engine);
     }
     return values;
@@ -105,7 +105,7 @@ inline VectorResults array_to_vector(const Inputs& source, const T1& shared_argu
 inline ListResults vector_to_list(const std::vector<T1>& source, const T1& shared_argument)
 {
     ListResults result;
-    for (auto it = source.begin(); it != source.end(); ++it) {
+    for (std::vector<T1>::const_iterator it = source.begin(); it != source.end(); ++it) {
         result.push_back(apply_average(*it, shared_argument));
     }
     return result;
@@ -114,7 +114,7 @@ inline ListResults vector_to_list(const std::vector<T1>& source, const T1& share
 inline DequeResults list_to_deque(const std::list<T1>& source, const T1& shared_argument)
 {
     DequeResults result;
-    for (const auto& value : source) {
+    for (const T1& value : source) {
         result.push_back(apply_average(value, shared_argument));
     }
     return result;
@@ -124,7 +124,7 @@ inline ArrayResults deque_to_array(const std::deque<T1>& source, const T1& share
 {
     ArrayResults result{};
     std::size_t index = 0;
-    for (const auto& value : source) {
+    for (const T1& value : source) {
         result[index++] = apply_average(value, shared_argument);
     }
     return result;

@@ -106,7 +106,7 @@ inline Frequencies repeated_values(const Frequencies& counts, std::size_t minimu
 {
     Frequencies result;
     std::copy_if(counts.begin(), counts.end(), std::inserter(result, result.end()),
-        [minimum](const auto& entry) {
+        [minimum](const Frequencies::value_type& entry) {
             return entry.second >= minimum;
         });
     return result;
@@ -116,8 +116,8 @@ inline Frequencies common_duplicates_for(
     const Frequencies& first, const Frequencies& second)
 {
     Frequencies result;
-    for (const auto& entry : second) {
-        const auto found = first.find(entry.first);
+    for (const Frequencies::value_type& entry : second) {
+        const Frequencies::const_iterator found = first.find(entry.first);
         if (entry.second >= 2 && found != first.end() && found->second > 3) {
             result.emplace(found->first, found->second);
         }
@@ -131,8 +131,8 @@ inline Frequencies common_duplicates_algorithm(
     Frequencies result;
     // отбираем числа, которые одновременно удовлетворяют условиям обоих векторов
     std::copy_if(first.begin(), first.end(), std::inserter(result, result.end()),
-        [&second](const auto& entry) {
-            const auto found = second.find(entry.first);
+        [&second](const Frequencies::value_type& entry) {
+            const Frequencies::const_iterator found = second.find(entry.first);
             return entry.second > 3 && found != second.end() && found->second >= 2;
         });
     return result;
