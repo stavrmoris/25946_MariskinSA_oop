@@ -16,23 +16,17 @@ using Frequencies = std::map<int, std::size_t>;
 
 inline Numbers read_numbers(const std::string& path)
 {
-    std::ifstream file(path);
-    if (!file) {
-        throw std::runtime_error("не удалось открыть файл: " + path);
-    }
+    std::ifstream file(path); // открываем поток файла
 
-    std::string text((std::istreambuf_iterator<char>(file)),
-                     std::istreambuf_iterator<char>());
-    if (file.bad()) {
-        throw std::runtime_error("ошибка чтения файла: " + path);
-    }
-    // в исходных файлах числа разделены как пробелами, так и запятыми
+    std::string text((std::istreambuf_iterator<char>(file)), // итератор чтения
+                     std::istreambuf_iterator<char>());      // итератор конца потока
+
     std::replace(text.begin(), text.end(), ',', ' ');
     std::istringstream input(text);
     Numbers values;
     while (input >> std::ws && input.peek() != std::char_traits<char>::eof()) {
         int value = 0;
-        // извлечение int также читает запись 89-56 как два числа 89 и -56
+        // читает запись 89-56 как 2 числа 89 и -56
         if (!(input >> value)) {
             throw std::runtime_error("некорректное число или выход за диапазон int в файле: " + path);
         }
@@ -45,7 +39,7 @@ inline Frequencies frequencies_for(const Numbers& values)
 {
     Frequencies counts;
     for (int value : values) {
-        // новый ключ получает счётчик 0, после чего увеличиваем его
+        // новый ключ получает 0, после - увеличиваем
         ++counts[value];
     }
     return counts;
@@ -62,7 +56,7 @@ inline Frequencies frequencies_algorithm(const Numbers& values)
 
 inline long long sum_accumulate(const Numbers& values)
 {
-    // начальное значение 0LL задаёт тип суммы long long вместо int
+    // 0LL задает тип long long вместо int
     return std::accumulate(values.begin(), values.end(), 0LL);
 }
 
@@ -77,24 +71,18 @@ inline long long sum_for_each(const Numbers& values)
 
 inline long long sum_first_ten(const Numbers& values)
 {
-    if (values.size() < 10) {
-        throw std::runtime_error("для суммы первых 10 элементов нужно хотя бы 10 чисел");
-    }
     return std::accumulate(values.begin(), values.begin() + 10, 0LL);
 }
 
 inline long long magnitude(int value)
 {
-    // сначала расширяем тип, чтобы модуль минимального int не вызвал переполнение
+    // расширяем тип, чтобы модуль не вызвал переполнение
     const long long wide_value = value;
     return wide_value < 0 ? -wide_value : wide_value;
 }
 
 inline int maximum_by_magnitude(const Numbers& values)
 {
-    if (values.empty()) {
-        throw std::runtime_error("нельзя найти максимум в пустом векторе");
-    }
     // сохраняем исходный знак, при равных модулях остаётся первое значение
     return std::accumulate(std::next(values.begin()), values.end(), values.front(),
         [](int current, int value) {
@@ -129,7 +117,6 @@ inline Frequencies common_duplicates_algorithm(
     const Frequencies& first, const Frequencies& second)
 {
     Frequencies result;
-    // отбираем числа, которые одновременно удовлетворяют условиям обоих векторов
     std::copy_if(first.begin(), first.end(), std::inserter(result, result.end()),
         [&second](const Frequencies::value_type& entry) {
             const Frequencies::const_iterator found = second.find(entry.first);
