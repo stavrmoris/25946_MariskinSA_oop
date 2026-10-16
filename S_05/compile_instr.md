@@ -1,6 +1,8 @@
 ## macOS
 
-Из папки `S_05/Task_04` или `S_05/Task_05`
+Открой терминал в `S_05/Task_04` или `S_05/Task_05`
+
+### Сборка, запуск и тесты
 
 ```sh
 cmake -S . -B build -DBUILD_TESTS=ON
@@ -10,13 +12,13 @@ ctest --test-dir build --output-on-failure
 ./build/tests/average_tests
 ```
 
-Демонстрационные провалы
+### Демонстрационные провалы
 
 ```sh
 ./build/tests/average_tests --gtest_also_run_disabled_tests --gtest_filter="AssertionDemo.*"
 ```
 
-Без тестов
+### Сборка без тестов
 
 ```sh
 cmake -S . -B build-no-tests -DBUILD_TESTS=OFF
@@ -26,7 +28,9 @@ cmake --build build-no-tests
 
 ## Windows
 
-В Developer PowerShell for VS, из папки `S_05\Task_04` или `S_05\Task_05`
+Открой Developer PowerShell for VS в `S_05\Task_04` или `S_05\Task_05`
+
+### Сборка, запуск и тесты
 
 ```powershell
 chcp 65001
@@ -38,13 +42,13 @@ ctest --test-dir build-windows --output-on-failure
 .\build-windows\tests\average_tests.exe
 ```
 
-Демонстрационные провалы
+### Демонстрационные провалы
 
 ```powershell
 .\build-windows\tests\average_tests.exe --gtest_also_run_disabled_tests --gtest_filter="AssertionDemo.*"
 ```
 
-Без тестов
+### Сборка без тестов
 
 ```powershell
 cmake -S . -B build-windows-no-tests -G "NMake Makefiles" -DBUILD_TESTS=OFF
