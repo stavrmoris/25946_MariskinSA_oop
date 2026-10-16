@@ -7,5 +7,48 @@
 !/.gitignore
 !README.md
 !BUILD.md
+!CMakeLists.txt
 # Обязательный результат домашнего задания 3.IV в формате Markdown.
 !/S_03/Task_04/results.md
+
+# Исключаем результаты сборки и прочий мусор.
+# Правила идут после исключений (!), поэтому имеют приоритет.
+build/
+x64/
+.idea/
+.vs/
+.DS_Store
+
+# Объектные и бинарные файлы компиляции.
+*.obj
+*.o
+*.out
+*.exe
+*.dll
+*.lib
+*.a
+*.so
+*.dylib
+*.pdb
+*.idb
+*.ilk
+*.exp
+*.tlog
+*.log
+*.d
+*.dSYM/
+
+# Артефакты CMake.
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+CTestTestfile.cmake
+Makefile
+*.cmake
+!CMakeLists.txt
+
+# Прочие рабочие файлы.
+*.stackdump
+*.orig
+*.rej
+*~
