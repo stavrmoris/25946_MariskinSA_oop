@@ -15,3 +15,9 @@ target_include_directories(robot INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}")
 
 add_executable(robot_app main.cpp)
 target_link_libraries(robot_app PRIVATE robot)
+
+add_executable(robot_lifetime main_lifetime.cpp)
+target_link_libraries(robot_lifetime PRIVATE robot)
+
+add_executable(robot_containers main_containers.cpp)
+target_link_libraries(robot_containers PRIVATE robot)

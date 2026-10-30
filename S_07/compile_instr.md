@@ -49,6 +49,8 @@ cmake --build S_07/Task_05/build
 cmake -S S_07/Task_06 -B S_07/Task_06/build
 cmake --build S_07/Task_06/build
 ./S_07/Task_06/build/robot_app
+./S_07/Task_06/build/robot_lifetime
+./S_07/Task_06/build/robot_containers
 ```
 
 ## Windows
@@ -75,6 +77,8 @@ cmake --build S_07/Task_05/build-windows
 cmake -S S_07/Task_06 -B S_07/Task_06/build-windows -G "NMake Makefiles"
 cmake --build S_07/Task_06/build-windows
 .\S_07\Task_06\build-windows\robot_app.exe
+.\S_07\Task_06\build-windows\robot_lifetime.exe
+.\S_07\Task_06\build-windows\robot_containers.exe
 ```
 
 Для 7.IV–7.VI вводите четыре поля: `"Арчи" 80 "идти вперёд" 12.5`
