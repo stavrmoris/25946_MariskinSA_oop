@@ -1,0 +1,20 @@
+cmake_minimum_required(VERSION 3.14)
+project(oop09_task_1 LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+if(MSVC)
+    add_compile_options(/utf-8 /W4)
+else()
+    add_compile_options(-Wall -Wextra -pedantic)
+endif()
+
+add_library(robot_components STATIC control_station.cpp maintenance_log.cpp)
+target_include_directories(robot_components PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
+add_library(robot INTERFACE)
+target_include_directories(robot INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}")
+target_link_libraries(robot INTERFACE robot_components)
+
+add_executable(robot_app main.cpp)
+target_link_libraries(robot_app PRIVATE robot)
