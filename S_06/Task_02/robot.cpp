@@ -1,5 +1,4 @@
 #include "robot.h"
-
 #include <algorithm>
 #include <cmath>
 #include <iostream>
@@ -68,7 +67,6 @@ QuadrupedRobot& QuadrupedRobot::operator=(const QuadrupedRobot& other)
         battery_ = other.battery_;
         distance_today_ = other.distance_today_;
     }
-    // присваивание меняет данные существующего робота, но сохраняет его id
     log("оператор присваивания");
     return *this;
 }
