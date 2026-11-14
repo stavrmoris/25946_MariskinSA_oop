@@ -1,0 +1,27 @@
+digraph Robots {
+    graph [rankdir=BT, fontname="Arial", label="ДЗ 11: обычный и виртуальный ромб", labelloc=t];
+    node [shape=record, fontname="Arial"];
+    edge [arrowhead=empty, fontname="Arial"];
+    subgraph cluster_ordinary {
+        label="Проблема: две копии базового робота";
+        ordinary_base [label="{ordinary::QuadrupedRobot|- name_ : string|+ QuadrupedRobot(name)\l+ getName()\l}"];
+        ordinary_cargo [label="{ordinary::CargoRobot|- cargo_weight_ : double|+ CargoRobot(name, weight)\l+ getCargoWeight()\l}"];
+        ordinary_autonomous [label="{ordinary::AutonomousRobot|- autonomous_range_ : double|+ AutonomousRobot(name, range)\l+ getAutonomousRange()\l}"];
+        ordinary_combined [label="{ordinary::AutonomousCargoRobot|+ AutonomousCargoRobot(name, weight, range)\l}"];
+        ordinary_cargo -> ordinary_base [label="public"];
+        ordinary_autonomous -> ordinary_base [label="public"];
+        ordinary_combined -> ordinary_cargo [label="public"];
+        ordinary_combined -> ordinary_autonomous [label="public"];
+    }
+    subgraph cluster_fixed {
+        label="Решение: одна виртуальная база";
+        fixed_base [label="{fixed::QuadrupedRobot|- name_ : string|+ QuadrupedRobot(name)\l+ getName()\l}"];
+        fixed_cargo [label="{fixed::CargoRobot|- cargo_weight_ : double|+ CargoRobot(name, weight)\l+ getCargoWeight()\l}"];
+        fixed_autonomous [label="{fixed::AutonomousRobot|- autonomous_range_ : double|+ AutonomousRobot(name, range)\l+ getAutonomousRange()\l}"];
+        fixed_combined [label="{fixed::AutonomousCargoRobot|+ AutonomousCargoRobot(name, weight, range)\l}"];
+        fixed_cargo -> fixed_base [label="public virtual"];
+        fixed_autonomous -> fixed_base [label="public virtual"];
+        fixed_combined -> fixed_cargo [label="public"];
+        fixed_combined -> fixed_autonomous [label="public"];
+    }
+}
