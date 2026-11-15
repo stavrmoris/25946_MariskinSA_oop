@@ -1,0 +1,38 @@
+@startuml
+package book {
+class Human_basic {
+  # name : std::string
+  # family_name : std::string
+  + get_family_name()
+}
+class Human_alive {
+  # birth_year : unsigned
+  + get_name()
+  + get_birth_year()
+}
+class Human_weighted {
+  # weight : double
+  + set_weight(int)
+  + set_weight(double)
+  + get_weight()
+}
+class Human_can_read {
+  # readed_text : std::string
+  + read(text)
+}
+class Human_can_write {
+  # written_text : std::string
+  + write(text)
+  + get_written_text()
+}
+class Student {
+  + uni : std::string
+}
+Human_basic <|-- Human_alive
+Human_alive <|-- Human_weighted
+Human_weighted <|-- Human_can_read : virtual
+Human_weighted <|-- Human_can_write : virtual
+Human_can_read <|-- Student
+Human_can_write <|-- Student
+}
+@enduml

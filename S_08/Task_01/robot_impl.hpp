@@ -26,7 +26,7 @@ const std::string QuadrupedRobot<Charge, Distance>::class_name_ = "QuadrupedRobo
 
 template <typename Charge, typename Distance>
 QuadrupedRobot<Charge, Distance>::QuadrupedRobot()
-    : id_("robot-" + std::to_string(++robot_detail::next_id)), name_("робот"), battery_(100),
+    : id_(++robot_detail::next_id), name_("робот"), battery_(100),
       command_("ожидание"), distance_today_(0.0), distance_history_(nullptr)
 {
     normalize(name_, battery_, command_, distance_today_);
@@ -38,7 +38,7 @@ QuadrupedRobot<Charge, Distance>::QuadrupedRobot()
 template <typename Charge, typename Distance>
 QuadrupedRobot<Charge, Distance>::QuadrupedRobot(const std::string& name, Charge battery,
                              const std::string& command, Distance distance_today)
-    : id_("robot-" + std::to_string(++robot_detail::next_id)), name_(name), battery_(battery),
+    : id_(++robot_detail::next_id), name_(name), battery_(battery),
       command_(command), distance_today_(distance_today), distance_history_(nullptr)
 {
     normalize(name_, battery_, command_, distance_today_);
@@ -49,8 +49,8 @@ QuadrupedRobot<Charge, Distance>::QuadrupedRobot(const std::string& name, Charge
 
 template <typename Charge, typename Distance>
 QuadrupedRobot<Charge, Distance>::QuadrupedRobot(const QuadrupedRobot<Charge, Distance>& other)
-    : id_("robot-" + std::to_string(++robot_detail::next_id)), name_(other.name_),
-      battery_(other.battery_), command_(other.command_),
+    : id_(++robot_detail::next_id), name_(other.getName()),
+      battery_(other.battery_), command_(other.getCommand()),
       distance_today_(other.distance_today_), distance_history_(nullptr)
 {
     // копия владеет собственным массивом
@@ -63,9 +63,9 @@ QuadrupedRobot<Charge, Distance>::QuadrupedRobot(const QuadrupedRobot<Charge, Di
 }
 
 template <typename Charge, typename Distance>
-QuadrupedRobot<Charge, Distance>::QuadrupedRobot(QuadrupedRobot<Charge, Distance>&& other)
-    : id_("robot-" + std::to_string(++robot_detail::next_id)), name_("робот"),
-      battery_(other.battery_), command_("ожидание"),
+QuadrupedRobot<Charge, Distance>::QuadrupedRobot(QuadrupedRobot<Charge, Distance>&& other) noexcept
+    : id_(++robot_detail::next_id), name_(),
+      battery_(other.battery_), command_(),
       distance_today_(other.distance_today_), distance_history_(other.distance_history_)
 {
     name_.swap(other.name_);
@@ -82,8 +82,8 @@ template <typename Charge, typename Distance>
 QuadrupedRobot<Charge, Distance>& QuadrupedRobot<Charge, Distance>::operator=(const QuadrupedRobot<Charge, Distance>& other)
 {
     if (this != &other) {
-        std::string new_name(other.name_);
-        std::string new_command(other.command_);
+        std::string new_name(other.getName());
+        std::string new_command(other.getCommand());
         // сначала готовим новую память, затем освобождаем старую
         Distance* new_history = new Distance[history_days_];
         for (std::size_t day = 0; day < history_days_; ++day) {
@@ -102,7 +102,7 @@ QuadrupedRobot<Charge, Distance>& QuadrupedRobot<Charge, Distance>::operator=(co
 }
 
 template <typename Charge, typename Distance>
-QuadrupedRobot<Charge, Distance>& QuadrupedRobot<Charge, Distance>::operator=(QuadrupedRobot<Charge, Distance>&& other)
+QuadrupedRobot<Charge, Distance>& QuadrupedRobot<Charge, Distance>::operator=(QuadrupedRobot<Charge, Distance>&& other) noexcept
 {
     if (this != &other) {
         delete[] distance_history_;
@@ -149,10 +149,14 @@ void QuadrupedRobot<Charge, Distance>::normalize(std::string& name, Charge batte
 }
 
 template <typename Charge, typename Distance>
-void QuadrupedRobot<Charge, Distance>::log(const char* event) const
+void QuadrupedRobot<Charge, Distance>::log(const char* event) const noexcept
 {
-    std::cout << "[" << class_name_ << " | " << id_ << "] " << event
-              << " | объектов: " << object_count_ << "\n";
+    try {
+        std::cout << "[" << class_name_ << " | robot-" << id_ << "] " << event
+                  << " | объектов: " << object_count_ << "\n";
+    } catch (...) {
+        // сбой диагностического вывода не должен прерывать перемещение и уничтожение
+    }
 }
 
 template <typename Charge, typename Distance>
@@ -164,13 +168,23 @@ void QuadrupedRobot<Charge, Distance>::checkDay(std::size_t day) const
 }
 
 template <typename Charge, typename Distance>
-const std::string& QuadrupedRobot<Charge, Distance>::getId() const { return id_; }
+std::string QuadrupedRobot<Charge, Distance>::getId() const
+{
+    return "robot-" + std::to_string(id_);
+}
 template <typename Charge, typename Distance>
-const std::string& QuadrupedRobot<Charge, Distance>::getName() const { return name_; }
+const std::string& QuadrupedRobot<Charge, Distance>::getName() const
+{
+    // после перемещения пустая строка означает значение по умолчанию
+    return name_.empty() ? robot_detail::default_name : name_;
+}
 template <typename Charge, typename Distance>
 Charge QuadrupedRobot<Charge, Distance>::getBattery() const { return battery_; }
 template <typename Charge, typename Distance>
-const std::string& QuadrupedRobot<Charge, Distance>::getCommand() const { return command_; }
+const std::string& QuadrupedRobot<Charge, Distance>::getCommand() const
+{
+    return command_.empty() ? robot_detail::default_command : command_;
+}
 template <typename Charge, typename Distance>
 Distance QuadrupedRobot<Charge, Distance>::getDistanceToday() const { return distance_today_; }
 template <typename Charge, typename Distance>
@@ -200,25 +214,25 @@ void QuadrupedRobot<Charge, Distance>::setState(const std::string& name, Charge 
 template <typename Charge, typename Distance>
 void QuadrupedRobot<Charge, Distance>::setName(const std::string& name)
 {
-    setState(name, battery_, command_, distance_today_);
+    setState(name, battery_, getCommand(), distance_today_);
 }
 
 template <typename Charge, typename Distance>
 void QuadrupedRobot<Charge, Distance>::setBattery(Charge battery)
 {
-    setState(name_, battery, command_, distance_today_);
+    setState(getName(), battery, getCommand(), distance_today_);
 }
 
 template <typename Charge, typename Distance>
 void QuadrupedRobot<Charge, Distance>::setCommand(const std::string& command)
 {
-    setState(name_, battery_, command, distance_today_);
+    setState(getName(), battery_, command, distance_today_);
 }
 
 template <typename Charge, typename Distance>
 void QuadrupedRobot<Charge, Distance>::setDistanceToday(Distance distance)
 {
-    setState(name_, battery_, command_, distance);
+    setState(getName(), battery_, getCommand(), distance);
 }
 
 template <typename Charge, typename Distance>
@@ -237,9 +251,9 @@ void QuadrupedRobot<Charge, Distance>::setDistanceForDay(std::size_t day, Distan
 template <typename Charge, typename Distance>
 void QuadrupedRobot<Charge, Distance>::print() const
 {
-    std::cout << "--- робот " << id_ << " ---\n"
-              << "имя: " << name_ << " | заряд: " << battery_ << "%\n"
-              << "команда: " << command_ << " | дистанция за сегодня: "
+    std::cout << "--- робот " << getId() << " ---\n"
+              << "имя: " << getName() << " | заряд: " << battery_ << "%\n"
+              << "команда: " << getCommand() << " | дистанция за сегодня: "
               << distance_today_ << " м\nистория за последние 10 дней (м):";
     for (std::size_t day = 0; day < history_days_; ++day) {
         std::cout << ' ' << getDistanceForDay(day);

@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <utility>
+#include <vector>
 
 using Robot = QuadrupedRobot<int, double>;
 
@@ -55,6 +56,15 @@ int main()
         std::cout << "\n=== непосредственное создание из временного объекта ===\n";
         Robot direct = Robot("Рекс", 70, "стоп", 3.5);
         std::cout << "в C++17 здесь нет вызова copy или move конструктора\n" << direct << '\n';
+        std::cout << "\n=== перемещение при расширении std::vector ===\n";
+        std::cout << "перемещение без исключений: " << std::boolalpha
+                  << std::is_nothrow_move_constructible_v<Robot> << '\n';
+        std::vector<Robot> robots;
+        robots.emplace_back("Арчи", 80, "вперёд", 12.5);
+        robots.front().setDistanceForDay(0, 100.0);
+        std::cout << "увеличиваем ёмкость: ожидаем конструктор перемещения\n";
+        robots.reserve(robots.capacity() + 1);
+        std::cout << "данные после расширения: " << robots.front() << '\n';
         std::cout << "объектов перед выходом: " << Robot::getObjectCount() << '\n';
     }
     std::cout << "объектов после выхода: " << Robot::getObjectCount() << '\n';

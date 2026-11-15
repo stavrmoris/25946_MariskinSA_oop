@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <string>
 #include <utility>
+#include <vector>
 
 using Robot = QuadrupedRobot<int, double>;
 using FloatRobot = QuadrupedRobot<long long, float>;
@@ -197,4 +198,56 @@ TEST_F(RobotTest, ConstRvalueUsesCopyConstructor)
     EXPECT_NE(copy.getId(), source.getId());
     copy.setDistanceForDay(0, 20.0);
     EXPECT_DOUBLE_EQ(source.getDistanceForDay(0), 100.0);
+}
+
+TEST_F(RobotTest, MoveOperationsAreNoexcept)
+{
+    EXPECT_TRUE((std::is_nothrow_move_constructible_v<Robot>));
+    EXPECT_TRUE((std::is_nothrow_move_assignable_v<Robot>));
+    EXPECT_TRUE((std::is_nothrow_move_constructible_v<FloatRobot>));
+    EXPECT_TRUE((std::is_nothrow_move_assignable_v<FloatRobot>));
+}
+
+TEST_F(RobotTest, VectorReallocationMovesInsteadOfCopying)
+{
+    const std::string long_name(200, 'a');
+    const std::string long_command(200, 'b');
+    std::vector<Robot> robots;
+    robots.emplace_back(long_name, 80, long_command, 12.5);
+    robots.emplace_back("Рекс", 60, "стоп", 3.25);
+    robots.front().setDistanceForDay(0, 123.0);
+    robots.back().setDistanceForDay(9, 456.0);
+    const std::size_t count = Robot::getObjectCount();
+
+    testing::internal::CaptureStdout();
+    // запрос больше текущей ёмкости гарантирует перенос существующих элементов
+    robots.reserve(robots.capacity() + 1);
+    const std::string messages = testing::internal::GetCapturedStdout();
+
+    EXPECT_NE(messages.find("конструктор перемещения"), std::string::npos);
+    EXPECT_EQ(messages.find("конструктор копирования"), std::string::npos);
+    EXPECT_EQ(robots.size(), 2U);
+    EXPECT_EQ(Robot::getObjectCount(), count);
+    EXPECT_EQ(robots.front().getName(), long_name);
+    EXPECT_EQ(robots.front().getCommand(), long_command);
+    EXPECT_EQ(robots.front().getBattery(), 80);
+    EXPECT_DOUBLE_EQ(robots.front().getDistanceToday(), 12.5);
+    EXPECT_DOUBLE_EQ(robots.front().getDistanceForDay(0), 123.0);
+    EXPECT_DOUBLE_EQ(robots.back().getDistanceForDay(9), 456.0);
+    EXPECT_NE(robots.front().getId(), robots.back().getId());
+}
+
+TEST_F(RobotTest, IndividualSettersWorkAfterMoving)
+{
+    Robot owner(std::move(robot_));
+    robot_.setBattery(50);
+    robot_.setName("Новый");
+    robot_.setCommand("стоп");
+    robot_.setDistanceToday(2.0);
+    EXPECT_EQ(robot_.getName(), "Новый");
+    EXPECT_EQ(robot_.getCommand(), "стоп");
+    EXPECT_EQ(robot_.getBattery(), 50);
+    EXPECT_DOUBLE_EQ(robot_.getDistanceToday(), 2.0);
+    EXPECT_EQ(owner.getName(), "Арчи");
+    EXPECT_DOUBLE_EQ(owner.getDistanceForDay(0), 100.0);
 }

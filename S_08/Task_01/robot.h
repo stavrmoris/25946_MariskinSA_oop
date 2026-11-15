@@ -7,6 +7,8 @@
 
 namespace robot_detail {
 inline std::size_t next_id = 0;
+inline const std::string default_name = "робот";
+inline const std::string default_command = "ожидание";
 }
 
 template <typename Charge, typename Distance>
@@ -19,7 +21,7 @@ private:
     static constexpr std::size_t history_days_ = 10;
     static std::size_t object_count_;
     static const std::string class_name_;
-    const std::string id_;
+    const std::size_t id_;
     std::string name_;
     Charge battery_;
     std::string command_;
@@ -28,7 +30,7 @@ private:
 
     static void normalize(std::string& name, Charge battery,
                           std::string& command, Distance distance);
-    void log(const char* event) const;
+    void log(const char* event) const noexcept;
     void checkDay(std::size_t day) const;
 
 public:
@@ -36,12 +38,12 @@ public:
     QuadrupedRobot(const std::string& name, Charge battery,
                    const std::string& command, Distance distance_today);
     QuadrupedRobot(const QuadrupedRobot& other);
-    QuadrupedRobot(QuadrupedRobot&& other);
+    QuadrupedRobot(QuadrupedRobot&& other) noexcept;
     QuadrupedRobot& operator=(const QuadrupedRobot& other);
-    QuadrupedRobot& operator=(QuadrupedRobot&& other);
+    QuadrupedRobot& operator=(QuadrupedRobot&& other) noexcept;
     ~QuadrupedRobot();
 
-    const std::string& getId() const;
+    std::string getId() const;
     const std::string& getName() const;
     Charge getBattery() const;
     const std::string& getCommand() const;
